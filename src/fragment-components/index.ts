@@ -19,6 +19,8 @@ import * as text from './a-text';
 import * as textarea from './a-textarea';
 import * as textinput from './a-textinput';
 import * as link from './a-link';
+import * as list from './a-list';
+import * as orderedList from './a-ordered-list';
 import * as overflowMenu from './a-overflow-menu';
 // Tiles
 import * as tile from './tiles/a-tile';
@@ -42,6 +44,8 @@ export * from './a-component';
 export { AFragment, AFragmentSettingsUI, AFragmentCodeUI } from './a-fragment';
 export { AGrid, AGridSettingsUI } from './a-grid';
 export { ALink, ALinkSettingsUI, ALinkCodeUI } from './a-link';
+export { AList, AListSettingsUI, AListCodeUI } from './a-list';
+export { AOrderedList, AOrderedListSettingsUI, AOrderedListCodeUI } from './a-ordered-list';
 export { ANumberInput, ANumberInputSettingsUI, ANumberInputCodeUI } from './a-numberinput';
 export { AProgressIndicator, AProgressIndicatorSettingsUI, AProgressIndicatorCodeUI } from './a-progress-indicator';
 export { ARow, ARowSettingsUI } from './a-row';
@@ -77,6 +81,8 @@ export const allComponents = {
 	radio,
 	radioGroup,
 	link,
+	list,
+	orderedList,
 	numberinput,
 	progressIndicator,
 	row,
