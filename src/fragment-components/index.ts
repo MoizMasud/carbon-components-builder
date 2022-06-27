@@ -21,9 +21,11 @@ import * as textinput from './a-textinput';
 import * as link from './a-link';
 import * as list from './a-list';
 import * as orderedList from './a-ordered-list';
+import * as loading from './a-loading';
 import * as overflowMenu from './a-overflow-menu';
 // Tiles
 import * as tile from './tiles/a-tile';
+import * as toggle from './a-toggle';
 import * as clickabletile from './tiles/a-clickable-tile';
 import * as expandabletile from './tiles/a-expandable-tile';
 import * as tilefold from './tiles/a-tile-fold';
@@ -34,8 +36,8 @@ import * as radioTileGroup from './tiles/a-radio-tile-group';
 
 // Accordion
 export { AAccordion, AAccordionSettingsUI } from './accordion/a-accordion';
-export { AAccordionItem, AAccordionItemSettingsUI } from './accordion/a-accordion-item';
-export { AButton, AButtonSettingsUI } from './a-button';
+export { AAccordionItem, AAccordionItemCodeUI, AAccordionItemSettingsUI } from './accordion/a-accordion-item';
+export { AButton, AButtonCodeUI, AButtonSettingsUI } from './a-button';
 export { ACheckbox, ACheckboxSettingsUI, ACheckboxCodeUI } from './a-checkbox';
 export { AColumn, AColumnSettingsUI } from './a-column';
 export { AComboBox, AComboBoxSettingsUI, AComboBoxCodeUI } from './a-combobox';
@@ -43,6 +45,7 @@ export { ADropdown, ADropdownSettingsUI, ADropdownCodeUI } from './a-dropdown';
 export * from './a-component';
 export { AFragment, AFragmentSettingsUI, AFragmentCodeUI } from './a-fragment';
 export { AGrid, AGridSettingsUI } from './a-grid';
+export { ALoading, ALoadingCodeUI, ALoadingSettingsUI } from './a-loading';
 export { ALink, ALinkSettingsUI, ALinkCodeUI } from './a-link';
 export { AList, AListSettingsUI, AListCodeUI } from './a-list';
 export { AOrderedList, AOrderedListSettingsUI, AOrderedListCodeUI } from './a-ordered-list';
@@ -60,6 +63,7 @@ export { ARadioGroup, ARadioGroupSettingsUI, ARadioGroupCodeUI } from './a-radio
 
 // Tiles
 export { ATile, ATileCodeUI, ATileSettingsUI } from './tiles/a-tile';
+export { AToggle, AToggleSettingsUI, AToggleCodeUI } from './a-toggle';
 export { AClickableTile, AClickableTileCodeUI, AClickableTileSettingsUI } from './tiles/a-clickable-tile';
 export { AExpandableTile, AExpandableTileCodeUI, AExpandableSettingsUI } from './tiles/a-expandable-tile';
 export { ATileFold, ATileFoldSettingsUI } from './tiles/a-tile-fold';
@@ -78,6 +82,7 @@ export const allComponents = {
 	dropdown,
 	fragment,
 	grid,
+	loading,
 	radio,
 	radioGroup,
 	link,
@@ -94,6 +99,7 @@ export const allComponents = {
 	overflowMenu,
 	// Tiles
 	tile,
+	toggle,
 	clickabletile,
 	expandabletile,
 	tilefold,
