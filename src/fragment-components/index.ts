@@ -19,8 +19,8 @@ import * as text from './a-text';
 import * as textarea from './a-textarea';
 import * as textinput from './a-textinput';
 import * as link from './a-link';
+import * as listItem from './a-list-item';
 import * as list from './a-list';
-import * as orderedList from './a-ordered-list';
 import * as loading from './a-loading';
 import * as overflowMenu from './a-overflow-menu';
 // Tiles
@@ -48,7 +48,7 @@ export { AGrid, AGridSettingsUI } from './a-grid';
 export { ALoading, ALoadingCodeUI, ALoadingSettingsUI } from './a-loading';
 export { ALink, ALinkSettingsUI, ALinkCodeUI } from './a-link';
 export { AList, AListSettingsUI, AListCodeUI } from './a-list';
-export { AOrderedList, AOrderedListSettingsUI, AOrderedListCodeUI } from './a-ordered-list';
+export { AListItem, AListItemSettingsUI, AListItemCodeUI } from './a-list-item';
 export { ANumberInput, ANumberInputSettingsUI, ANumberInputCodeUI } from './a-numberinput';
 export { AProgressIndicator, AProgressIndicatorSettingsUI, AProgressIndicatorCodeUI } from './a-progress-indicator';
 export { ARow, ARowSettingsUI } from './a-row';
@@ -86,8 +86,8 @@ export const allComponents = {
 	radio,
 	radioGroup,
 	link,
+	listItem,
 	list,
-	orderedList,
 	numberinput,
 	progressIndicator,
 	row,
