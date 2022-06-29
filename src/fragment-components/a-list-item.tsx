@@ -19,16 +19,14 @@ import {
 } from '../utils/fragment-tools';
 
 export const AListItemSettingsUI = ({ selectedComponent, setComponent }: any) => {
-	const [fragment] = useFragment();
-	const parentComponent = getParentComponent(fragment.data, selectedComponent);
 	return <>
 		<TextInput
-				value={selectedComponent.itemText}
+				value={selectedComponent.value}
 				labelText='Label'
 				onChange={(event: any) => {
 					setComponent({
 						...selectedComponent,
-						itemText: event.currentTarget.value
+						value: event.currentTarget.value
 					})}}
 			/>
 	</>;
@@ -50,10 +48,6 @@ export const AListItemCodeUI = ({ selectedComponent, setComponent }: any) => {
 		/>;
 };
 
-const addButtonStyle = css`
-	position: relative;
-`;
-
 export const AListItem = ({
 	componentObj,
 	selected,
@@ -69,19 +63,28 @@ export const AListItem = ({
 				type: 'insert',
 				component: {
 					type: 'listItem',
-					value: componentObj.id,
-					itemText: 'New level',
-					children: []
+					value: 'New Item',
+					items: []
 				}
 			},
 			parentComponent.id,
 			parentComponent.items.indexOf(componentObj) + offset
 		)
 	});
+	function nested(step: any, child = false) {
+		if(!step.items) {
+			return;
+		}
+		return <OrderedList nested={child}>
+				<ListItem className={css`cursor:pointer`}>
+					{step.value}
+					{step.items.length > 0 ? step.items.map((item: any) =>  nested(item, true)) : []}
+				</ListItem>
+		</OrderedList>
+	}
 	return (
 		<Adder
 		active={selected}
-		addButtonsCss={addButtonStyle}
 		key={componentObj.id}
 		bottomAction={() => addListItem(1)}>
 			<AComponent
@@ -89,14 +92,12 @@ export const AListItem = ({
 			headingCss={css`width: fit-content; min-width: 9rem;`}
 			componentObj={componentObj}
 			{...rest}>
-				<OrderedList>
-					<ListItem
-						className={css`margin-left: 30px;`}
-						value={componentObj.value}
-						id={componentObj.id}>
-							{componentObj.itemText}
+				{
+					<ListItem className={css`cursor:pointer`}>
+						{componentObj.value}
+						{componentObj.items.length > 0 ? componentObj.items.map((step: any) => nested(step, true)) : []}
 					</ListItem>
-				</OrderedList>
+				}
 			</AComponent>
 		</Adder>
 	);
@@ -111,7 +112,7 @@ export const componentInfo: ComponentInfo = {
 	select={select}
 	remove={remove}
 	selected={selected}>
-		{componentObj.itemText}
+		{componentObj.value}
 	</AListItem>,
 	keywords: ['list', 'item'],
 	name: 'List item',

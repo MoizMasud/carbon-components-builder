@@ -1,18 +1,25 @@
 import React, { useEffect, useState } from 'react';
+import { HierarchyList } from 'carbon-addons-iot-react';
 import {
 	ListItem,
 	TextInput,
 	OrderedList,
 	Accordion,
-	AccordionItem
+	AccordionItem,
+	Button
 } from 'carbon-components-react';
 import { AComponent, ComponentInfo } from './a-component';
 import { useFragment } from '../context';
 import { css } from 'emotion';
 import {
+	Add16,
+	TrashCan16
+} from '@carbon/icons-react';
+import {
 	getParentComponent,
-	DraggableTileList,
-	Adder
+	Adder,
+	updatedState,
+	stateWithoutComponent
 } from '../components';
 import image from './../assets/component-icons/radio.svg';
 import {
@@ -21,85 +28,151 @@ import {
 	reactClassNamesFromComponentObj
 } from '../utils/fragment-tools';
 import { FragmentLayoutWidget } from '../components/fragment-layout-widget';
-import { flatten } from 'lodash';
-import { arrayBuffer } from 'stream/consumers';
+import { actionIconStyle } from '../routes';
+
+const fragmentLayoutStyle = css`
+	.iot--list--page {
+		display: none;
+	}
+`;
 
 export const AListSettingsUI = ({ selectedComponent, setComponent }: any) => {
-	const [fragment] = useFragment();
-	const parentComponent = getParentComponent(fragment.data, selectedComponent);
-	const updateListItems = (key: string, value: any, index: number) => {
-		const step = {
-			...selectedComponent.items[index],
-			[key]: value
-		};
-
-		setComponent({
-			...selectedComponent,
-			items: [
-				...selectedComponent.items.slice(0, index),
-				step,
-				...selectedComponent.items.slice(index + 1)
-			]
-		});
-	}
-	const updateStepList = (newList: any[]) => {
-		setComponent({
-			...selectedComponent,
-			items: newList
-		});
-	};
-	// const addChildren = ((component: any, id: any) => {
-	// 	return component.items.map((item: any) => {
-	// 		if(item.id === component.id) {
-	// 			debugger;
-	// 			item.items.push({
-	// 				itemText: 'new',
-	// 				items: []
-	// 			});
-	// 		}
-
-	// 		if (item.items && item.items.length)  {
-	// 			item.items = addChildren(item, item.id)
-	// 		}
-	// 		return item
-	// 	})
-	// });
-	// const template = (item: any, index: number) => {
-	// 	return <>
-	// 		<TextInput
-	// 			light
-	// 			value={item.itemText}
-	// 			labelText='Label'
-	// 			onChange={(event: any) => {
-	// 				updateListItems('itemText', event.currentTarget.value, index);
-	// 			}}
-	// 		/>
-	// 		<Adder
-	// 			active={selectedComponent}
-	// 			key={selectedComponent.id}
-	// 			id={`add-${index}`}
-	// 			bottomAction={() => addChildren(selectedComponent, index)}>
-	// 		</Adder>
-	// 	</>;
-	// };
 	const [isAccordionOpen, setIsAccordionOpen] = useState({} as any);
-
 	useEffect(() => {
 		setIsAccordionOpen({
-			small: selectedComponent.smallSpan || selectedComponent.smallOffset,
-			max: selectedComponent.maxSpan || selectedComponent.maxOffset
+			small: selectedComponent.smallSpan || selectedComponent.smallOffset
 		});
 	}, [selectedComponent]);
 	return <>
 			<Accordion align='start'>
 				<AccordionItem
+				id={selectedComponent.id}
 				title='Items list'
 				className='layout-widget'
 				open={isAccordionOpen.small}>
-					<FragmentLayoutWidget fragment={fragment} setFragment={setComponent} />
+					<LayoutWidget selectedComponent={selectedComponent} setComponent={setComponent}/>
 				</AccordionItem>
 			</Accordion>
 	</>;
+};
+
+const getComponentObjById = (id: string, componentObj: any) => {
+	if (componentObj.id === id) {
+		return componentObj;
+	}
+
+	if (!componentObj.items) {
+		return undefined;
+	}
+
+	for (const item of componentObj.items) {
+		const foundComponentObj: any = getComponentObjById(id, item);
+		if (foundComponentObj) {
+			return foundComponentObj;
+		}
+	}
+	return undefined;
+};
+
+const LayoutWidget = ({ setComponent, title }: any) => {
+	const [fragment, setFragment] = useFragment();
+	const addToList = (id: any) => {
+		const component = getComponentObjById(id, fragment.data);
+		const dataList = [...component.items]
+		const newChildObject = {
+			type: 'listItem',
+			value: 'New child',
+			items: []
+		}
+		const updateList = (newList: any[]) => {
+			setComponent({
+				...component,
+				items: newList
+			});
+		};
+		dataList.push(newChildObject);
+		updateList(dataList);
+	};
+
+	const deleteFromList = (componentObj: any) => {
+		const parentComponent = getParentComponent(fragment.data, componentObj);
+		const dataList = [...parentComponent.items]
+		const updateList = (newList: any[]) => {
+			setComponent({
+				...parentComponent,
+				items: newList
+			});
+		};
+		const index = dataList.findIndex((o) => o.id === componentObj.id);
+	   	if (index !== -1) dataList.splice(index, 1);
+		updateList(dataList);
+	}
+
+	const getReorderedComponentObjFromHierarchyListItem = (hierchyListItem: any, componentObj: any) => {
+		if (!hierchyListItem) {
+			return undefined;
+		}
+
+		const component = getComponentObjById(hierchyListItem.id, componentObj);
+
+		if (!component) {
+			return undefined;
+		}
+
+		return {
+			...component,
+			items: hierchyListItem.children?.map((child: any) => getReorderedComponentObjFromHierarchyListItem(child, componentObj))
+		};
+	};
+	const getHierarchyListItemsFromComponentObj = (componentObj: any) => {
+		if (!componentObj) {
+			return null;
+		}
+		return {
+			id: componentObj.id,
+			content: {
+				value: componentObj.value ? componentObj.value : componentObj.type,
+				rowActions: () => <>
+					<Button
+						id={componentObj.id}
+						kind='ghost'
+						aria-label='Add Children'
+						title='Add Children'
+						onClick={(event: any) => {
+							event.stopPropagation();
+							addToList(event.currentTarget.id);
+						}}>
+						<Add16 className={actionIconStyle} />
+					</Button>
+					<Button
+						id={componentObj.id}
+						kind='ghost'
+						aria-label='Delete'
+						title='Delete'
+						onClick={(event: any) => {
+							event.stopPropagation();
+							deleteFromList(componentObj);
+						}}>
+						<TrashCan16 className={actionIconStyle} />
+					</Button>
+				</>
+			},
+			children: componentObj.items?.map((item: any) => getHierarchyListItemsFromComponentObj(item))
+		};
+	};
+
+	return <HierarchyList
+		title={title}
+		className={fragmentLayoutStyle}
+		items={getHierarchyListItemsFromComponentObj(fragment.data)?.children}
+		onListUpdated={(updatedItems: any[]) => {
+			setFragment({
+				...fragment,
+				data: getReorderedComponentObjFromHierarchyListItem({ id: 1, children: updatedItems }, fragment.data)
+			});
+		}}
+		editingStyle='single'
+	/>;
 };
 
 export const AListCodeUI = ({ selectedComponent, setComponent }: any) => {
@@ -119,44 +192,19 @@ export const AListCodeUI = ({ selectedComponent, setComponent }: any) => {
 };
 
 export const AList = ({
+	children,
 	componentObj,
 	selected,
 	...rest
 }: any) => {
-	let flattenList: any[] = [];
-	function bfs(array: any) {
-		let queue = [array]; // the root node
-		let nested = false;
-		while(queue.length > 0) {
-			let current = queue.shift(); // take the value at index 0 of the queue
-			current.map((step: any, index: number) => {
-					flattenList.push({id: step.id, value: step.itemText, level: step.codeContext.level});
-			});
-			for(const child of current) {
-				nested = true;
-				queue.push(child.items); // add the children of the current root node to the queue
-			}
-		}
-	}
-	bfs(componentObj.items);
 	return (
 			<AComponent
 			selected={selected}
 			headingCss={css`width: fit-content; min-width: 9rem;`}
 			componentObj={componentObj}
 			{...rest}>
-				<OrderedList>
-				{
-					flattenList.map((step: any, index: number) => step.level > 1 ?
-						<OrderedList nested>
-							<ListItem>
-								{step.value}
-							</ListItem>
-						</OrderedList> :
-						<ListItem>
-							{step.value}
-						</ListItem>)
-				}
+				<OrderedList className={css`margin-left: 20px; list-style: auto;`}>
+					{children}
 				</OrderedList>
 			</AComponent>
 	);
@@ -173,64 +221,13 @@ export const componentInfo: ComponentInfo = {
 		type: 'list',
 		items: [
 			{
-				codeContext: {
-					level: 1,
-				},
-				id: 'xas',
-				value: 'list level 1',
-				itemText: 'list level 1',
-				items: [
-					{
-						codeContext: {
-							level: 2
-						},
-						value: 'list level 2',
-						itemText: 'list level 2',
-						items: [
-							{
-								codeContext: {
-									level: 3
-								},
-								value: 'list level 3',
-								itemText: 'list level 3',
-								items: []
-							}
-						]
-					},
-					{
-						codeContext: {
-							level: 2
-						},
-						value: 'item 2 list level 2',
-						itemText: 'item 2 list level 2',
-						items: []
-					}
-
-				]
+				type: 'listItem',
+				value: 'item 1 level 1',
+				items: []
 			},
 			{
-				codeContext: {
-					level: 1
-				},
-				value: 'Ordered list item 2 level 1',
-				itemText: 'Ordered list item 2 level 1',
-				items: [
-					{
-						codeContext: {
-							level: 2
-						},
-						value: 'Ordered list level 2',
-						itemText: 'Ordered list level 2',
-						items: []
-					}
-				]
-			},
-			{
-				codeContext: {
-					level: 1
-				},
-				value:  'Ordered list item 3 level 1',
-				itemText: 'Ordered list item 3 level 1',
+				type: 'listItem',
+				value:  'item 2 level 1',
 				items: []
 			}
 		]
