@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { HierarchyList } from 'carbon-addons-iot-react';
 import {
-	ListItem,
 	TextInput,
 	OrderedList,
 	Accordion,
@@ -17,9 +16,6 @@ import {
 } from '@carbon/icons-react';
 import {
 	getParentComponent,
-	Adder,
-	updatedState,
-	stateWithoutComponent
 } from '../components';
 import image from './../assets/component-icons/radio.svg';
 import {
@@ -27,7 +23,6 @@ import {
 	angularClassNamesFromComponentObj,
 	reactClassNamesFromComponentObj
 } from '../utils/fragment-tools';
-import { FragmentLayoutWidget } from '../components/fragment-layout-widget';
 import { actionIconStyle } from '../routes';
 
 const fragmentLayoutStyle = css`
@@ -44,15 +39,25 @@ export const AListSettingsUI = ({ selectedComponent, setComponent }: any) => {
 		});
 	}, [selectedComponent]);
 	return <>
-			<Accordion align='start'>
-				<AccordionItem
-				id={selectedComponent.id}
-				title='Items list'
-				className='layout-widget'
-				open={isAccordionOpen.small}>
-					<LayoutWidget selectedComponent={selectedComponent} setComponent={setComponent}/>
-				</AccordionItem>
-			</Accordion>
+		<TextInput
+		value={selectedComponent.legendName}
+		labelText='Legend name'
+		placeholder='Legend name'
+		onChange={(event: any) => {
+			setComponent({
+				...selectedComponent,
+				legendName: event.currentTarget.value
+			});
+		}} />
+		<Accordion align='start'>
+			<AccordionItem
+			id={selectedComponent.id}
+			title='Items list'
+			className='layout-widget'
+			open={isAccordionOpen.small}>
+				<LayoutWidget selectedComponent={selectedComponent} setComponent={setComponent}/>
+			</AccordionItem>
+		</Accordion>
 	</>;
 };
 
@@ -78,10 +83,10 @@ const LayoutWidget = ({ setComponent, title }: any) => {
 	const [fragment, setFragment] = useFragment();
 	const addToList = (id: any) => {
 		const component = getComponentObjById(id, fragment.data);
-		const dataList = [...component.items]
+		const dataList = [...component.items];
 		const newChildObject = {
 			type: 'listItem',
-			value: 'New child',
+			value: 'Item',
 			items: []
 		}
 		const updateList = (newList: any[]) => {
@@ -136,7 +141,7 @@ const LayoutWidget = ({ setComponent, title }: any) => {
 					<Button
 						id={componentObj.id}
 						kind='ghost'
-						aria-label='Add Children'
+						aria-label='Add Children' // What to call this?
 						title='Add Children'
 						onClick={(event: any) => {
 							event.stopPropagation();
@@ -203,6 +208,7 @@ export const AList = ({
 			headingCss={css`width: fit-content; min-width: 9rem;`}
 			componentObj={componentObj}
 			{...rest}>
+				<legend className='bx--label'>{componentObj.legendName}</legend>
 				<OrderedList className={css`margin-left: 20px; list-style: auto;`}>
 					{children}
 				</OrderedList>
@@ -219,15 +225,16 @@ export const componentInfo: ComponentInfo = {
 	type: 'list',
 	defaultComponentObj: {
 		type: 'list',
+		legendName: 'Ordered List',
 		items: [
 			{
 				type: 'listItem',
-				value: 'item 1 level 1',
+				value: 'Item',
 				items: []
 			},
 			{
 				type: 'listItem',
-				value:  'item 2 level 1',
+				value:  'Item',
 				items: []
 			}
 		]

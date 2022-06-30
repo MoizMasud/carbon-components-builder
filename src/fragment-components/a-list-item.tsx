@@ -21,14 +21,14 @@ import {
 export const AListItemSettingsUI = ({ selectedComponent, setComponent }: any) => {
 	return <>
 		<TextInput
-				value={selectedComponent.value}
-				labelText='Label'
-				onChange={(event: any) => {
-					setComponent({
-						...selectedComponent,
-						value: event.currentTarget.value
-					})}}
-			/>
+		value={selectedComponent.value}
+		labelText='Label'
+		onChange={(event: any) => {
+			setComponent({
+				...selectedComponent,
+				value: event.currentTarget.value
+			})
+		}} />
 	</>;
 };
 
@@ -44,8 +44,7 @@ export const AListItemCodeUI = ({ selectedComponent, setComponent }: any) => {
 						name: event.currentTarget.value
 					}
 				});
-			}}
-		/>;
+			}} />;
 };
 
 export const AListItem = ({
