@@ -9,7 +9,7 @@ import {
 } from 'carbon-components-react';
 import { AComponent, ComponentInfo } from './a-component';
 import { useFragment } from '../context';
-import { css } from 'emotion';
+import { css, cx } from 'emotion';
 import {
 	Add16,
 	TrashCan16
@@ -25,7 +25,7 @@ import {
 } from '../utils/fragment-tools';
 import { actionIconStyle } from '../routes';
 
-const fragmentLayoutStyle = css`
+const LayoutStyle = css`
 	.iot--list--page {
 		display: none;
 	}
@@ -168,7 +168,7 @@ const LayoutWidget = ({ setComponent, title }: any) => {
 
 	return <HierarchyList
 		title={title}
-		className={fragmentLayoutStyle}
+		className={LayoutStyle}
 		items={getHierarchyListItemsFromComponentObj(fragment.data)?.children}
 		onListUpdated={(updatedItems: any[]) => {
 			setFragment({
@@ -208,7 +208,9 @@ export const AList = ({
 			headingCss={css`width: fit-content; min-width: 9rem;`}
 			componentObj={componentObj}
 			{...rest}>
-				<legend className='bx--label'>{componentObj.legendName}</legend>
+				<legend className={cx(css`margin-left: 3px;`, "bx--label")}>
+					{componentObj.legendName}
+				</legend>
 				<OrderedList className={css`margin-left: 20px; list-style: auto;`}>
 					{children}
 				</OrderedList>
