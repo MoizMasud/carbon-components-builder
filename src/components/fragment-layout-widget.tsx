@@ -58,7 +58,7 @@ export const FragmentLayoutWidget = ({ fragment, setFragment, title }: any) => {
 		return {
 			id: componentObj.id,
 			content: {
-				value: componentObj.type ? componentObj.type : componentObj.value,
+				value: componentObj.type,
 				rowActions: () => <>
 					<Button
 						kind='ghost'
