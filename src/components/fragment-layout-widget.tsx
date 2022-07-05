@@ -55,6 +55,7 @@ export const FragmentLayoutWidget = ({ fragment, setFragment, title }: any) => {
 		if (!componentObj) {
 			return null;
 		}
+
 		return {
 			id: componentObj.id,
 			content: {
