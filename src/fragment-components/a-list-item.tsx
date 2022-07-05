@@ -5,13 +5,7 @@ import {
 	ListItem
 } from 'carbon-components-react';
 import { AComponent, ComponentInfo } from './a-component';
-import { useFragment } from '../context';
 import { css } from 'emotion';
-import {
-	getParentComponent,
-	updatedState,
-	Adder
-} from '../components';
 import {
 	nameStringToVariableString,
 	angularClassNamesFromComponentObj,
@@ -52,53 +46,45 @@ export const AListItem = ({
 	selected,
 	...rest
 }: any) => {
-	const [fragment, setFragment] = useFragment();
-	const parentComponent = getParentComponent(fragment.data, componentObj);
-	const addListItem = (offset = 0) => setFragment({
-		...fragment,
-		data: updatedState(
-			fragment.data,
-			{
-				type: 'insert',
-				component: {
-					type: 'listItem',
-					value: 'New Item',
-					items: []
-				}
-			},
-			parentComponent.id,
-			parentComponent.items.indexOf(componentObj) + offset
-		)
-	});
 	function nested(step: any, child = false) {
 		if(!step.items) {
 			return;
 		}
-		return <OrderedList nested={child}>
-				<ListItem className={css`cursor:pointer`}>
+		return 	<ListItem className={css`cursor:pointer`}>
 					{step.value}
-					{step.items.length > 0 ? step.items.map((item: any) =>  nested(item, true)) : []}
-				</ListItem>
-		</OrderedList>
+					{step.items.length > 0 ?
+					<OrderedList nested={child}>
+						{step.items.map((innerStep: any) => nested(innerStep, true))}
+					</OrderedList>
+					: [] }
+			</ListItem>
 	}
+	function foo(object: any) {
+		var result = []
+		while (object) {
+		  result.push(object)
+		  object = object.items
+		}
+		return result
+	  }
+
 	return (
-		<Adder
-		active={selected}
-		key={componentObj.id}
-		bottomAction={() => addListItem(1)}>
-			<AComponent
-			selected={selected}
-			headingCss={css`width: fit-content; min-width: 9rem;`}
-			componentObj={componentObj}
-			{...rest}>
-				{
-					<ListItem className={css`cursor:pointer`}>
-						{componentObj.value}
-						{componentObj.items.length > 0 ? componentObj.items.map((step: any) => nested(step, true)) : []}
-					</ListItem>
-				}
-			</AComponent>
-		</Adder>
+		<AComponent
+		selected={selected}
+		headingCss={css`width: fit-content; min-width: 9rem;`}
+		componentObj={componentObj}
+		{...rest}>
+			{
+				<ListItem className={css`cursor:pointer`}>
+					{componentObj.value}
+					{componentObj.items.length > 0 ?
+						<OrderedList nested={true}>
+							{componentObj.items.map((step: any) => nested(step, true))}
+						</OrderedList>
+						 : [] }
+				</ListItem>
+			}
+		</AComponent>
 	);
 };
 
