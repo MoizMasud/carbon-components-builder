@@ -13,17 +13,15 @@ import {
 } from '../utils/fragment-tools';
 
 export const AListItemSettingsUI = ({ selectedComponent, setComponent }: any) => {
-	return <>
-		<TextInput
+	return <TextInput
 		value={selectedComponent.value}
 		labelText='Label'
 		onChange={(event: any) => {
 			setComponent({
 				...selectedComponent,
 				value: event.currentTarget.value
-			})
-		}} />
-	</>;
+			});
+		}} />;
 };
 
 export const AListItemCodeUI = ({ selectedComponent, setComponent }: any) => {
@@ -46,28 +44,18 @@ export const AListItem = ({
 	selected,
 	...rest
 }: any) => {
-	function nested(step: any, child = false) {
-		if(!step.items) {
+	function getChildren(step: any, child = false) {
+		if (!step.items) {
 			return;
 		}
 		return 	<ListItem className={css`cursor:pointer`}>
 					{step.value}
-					{step.items.length > 0 ?
-					<OrderedList nested={child}>
-						{step.items.map((innerStep: any) => nested(innerStep, true))}
-					</OrderedList>
+					{step.items.length > 0 ? <OrderedList nested={child}>
+							{step.items.map((innerStep: any) => getChildren(innerStep, true))}
+						</OrderedList>
 					: [] }
-			</ListItem>
+			</ListItem>;
 	}
-	function foo(object: any) {
-		var result = []
-		while (object) {
-		  result.push(object)
-		  object = object.items
-		}
-		return result
-	  }
-
 	return (
 		<AComponent
 		selected={selected}
@@ -77,11 +65,10 @@ export const AListItem = ({
 			{
 				<ListItem className={css`cursor:pointer`}>
 					{componentObj.value}
-					{componentObj.items.length > 0 ?
-						<OrderedList nested={true}>
-							{componentObj.items.map((step: any) => nested(step, true))}
+					{componentObj.items.length > 0 ? <OrderedList nested={true}>
+							{componentObj.items.map((step: any) => getChildren(step, true))}
 						</OrderedList>
-						 : [] }
+					: [] }
 				</ListItem>
 			}
 		</AComponent>
@@ -109,17 +96,17 @@ export const componentInfo: ComponentInfo = {
 	hideFromElementsPane: true,
 	codeExport: {
 		angular: {
-			inputs: ({ json }) => ``,
-			outputs: ({ json }) => ``,
+			inputs: ({ json }) => '',
+			outputs: ({ json }) => '',
 			imports: [],
 			code: ({ json }) => {
-				return ``;
+				return '';
 			}
 		},
 		react: {
 			imports: [''],
 			code: ({ json }) => {
-				return ``;
+				return '';
 			}
 		}
 	}

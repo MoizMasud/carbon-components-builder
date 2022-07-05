@@ -15,7 +15,7 @@ import {
 	TrashCan16
 } from '@carbon/icons-react';
 import {
-	getParentComponent,
+	getParentComponent
 } from '../components';
 import image from './../assets/component-icons/radio.svg';
 import {
@@ -30,36 +30,6 @@ const LayoutStyle = css`
 		display: none;
 	}
 `;
-
-export const AListSettingsUI = ({ selectedComponent, setComponent }: any) => {
-	const [isAccordionOpen, setIsAccordionOpen] = useState({} as any);
-	useEffect(() => {
-		setIsAccordionOpen({
-			small: selectedComponent.smallSpan || selectedComponent.smallOffset
-		});
-	}, [selectedComponent]);
-	return <>
-		<TextInput
-		value={selectedComponent.legendName}
-		labelText='Legend name'
-		placeholder='Legend name'
-		onChange={(event: any) => {
-			setComponent({
-				...selectedComponent,
-				legendName: event.currentTarget.value
-			});
-		}} />
-		<Accordion align='start'>
-			<AccordionItem
-			id={selectedComponent.id}
-			title='Items list'
-			className='layout-widget'
-			open={isAccordionOpen.small}>
-				<LayoutWidget selectedComponent={selectedComponent} setComponent={setComponent}/>
-			</AccordionItem>
-		</Accordion>
-	</>;
-};
 
 const getComponentObjById = (id: string, componentObj: any) => {
 	if (componentObj.id === id) {
@@ -79,7 +49,7 @@ const getComponentObjById = (id: string, componentObj: any) => {
 	return undefined;
 };
 
-const LayoutWidget = ({ setComponent, title }: any) => {
+const ListItemsWidget = ({ setComponent, title }: any) => {
 	const [fragment, setFragment] = useFragment();
 	const addToList = (id: any) => {
 		const component = getComponentObjById(id, fragment.data);
@@ -88,7 +58,7 @@ const LayoutWidget = ({ setComponent, title }: any) => {
 			type: 'listItem',
 			value: 'Item',
 			items: []
-		}
+		};
 		const updateList = (newList: any[]) => {
 			setComponent({
 				...component,
@@ -101,7 +71,7 @@ const LayoutWidget = ({ setComponent, title }: any) => {
 
 	const deleteFromList = (componentObj: any) => {
 		const parentComponent = getParentComponent(fragment.data, componentObj);
-		const dataList = [...parentComponent.items]
+		const dataList = [...parentComponent.items];
 		const updateList = (newList: any[]) => {
 			setComponent({
 				...parentComponent,
@@ -109,9 +79,11 @@ const LayoutWidget = ({ setComponent, title }: any) => {
 			});
 		};
 		const index = dataList.findIndex((o) => o.id === componentObj.id);
-	   	if (index !== -1) dataList.splice(index, 1);
+		if (index !== -1) {
+			dataList.splice(index, 1);
+		}
 		updateList(dataList);
-	}
+	};
 
 	const getReorderedComponentObjFromHierarchyListItem = (hierchyListItem: any, componentObj: any) => {
 		if (!hierchyListItem) {
@@ -141,7 +113,7 @@ const LayoutWidget = ({ setComponent, title }: any) => {
 					<Button
 						id={componentObj.id}
 						kind='ghost'
-						aria-label='Add Children' // What to call this?
+						aria-label='Add Children'
 						title='Add Children'
 						onClick={(event: any) => {
 							event.stopPropagation();
@@ -180,6 +152,36 @@ const LayoutWidget = ({ setComponent, title }: any) => {
 	/>;
 };
 
+export const AListSettingsUI = ({ selectedComponent, setComponent }: any) => {
+	const [isAccordionOpen, setIsAccordionOpen] = useState({} as any);
+	useEffect(() => {
+		setIsAccordionOpen({
+			small: selectedComponent.smallSpan || selectedComponent.smallOffset
+		});
+	}, [selectedComponent]);
+	return <>
+		<TextInput
+		value={selectedComponent.legendName}
+		labelText='Legend name'
+		placeholder='Legend name'
+		onChange={(event: any) => {
+			setComponent({
+				...selectedComponent,
+				legendName: event.currentTarget.value
+			});
+		}} />
+		<Accordion align='start'>
+			<AccordionItem
+			id={selectedComponent.id}
+			title='Items list'
+			className='layout-widget'
+			open={isAccordionOpen.small}>
+				<ListItemsWidget selectedComponent={selectedComponent} setComponent={setComponent}/>
+			</AccordionItem>
+		</Accordion>
+	</>;
+};
+
 export const AListCodeUI = ({ selectedComponent, setComponent }: any) => {
 	return <TextInput
 			value={selectedComponent.codeContext?.name}
@@ -208,7 +210,7 @@ export const AList = ({
 			headingCss={css`width: fit-content; min-width: 9rem;`}
 			componentObj={componentObj}
 			{...rest}>
-				<legend className={cx(css`margin-left: 3px;`, "bx--label")}>
+				<legend className={cx(css`margin-left: 3px;`, 'bx--label')}>
 					{componentObj.legendName}
 				</legend>
 				<OrderedList className={css`margin-left: 20px; list-style: auto;`}>
@@ -245,17 +247,17 @@ export const componentInfo: ComponentInfo = {
 	hideFromElementsPane: false,
 	codeExport: {
 		angular: {
-			inputs: ({ json }) => ``,
-			outputs: ({ json }) => ``,
+			inputs: ({ json }) => '',
+			outputs: ({ json }) => '',
 			imports: [],
 			code: ({ json }) => {
-				return ``;
+				return '';
 			}
 		},
 		react: {
 			imports: [''],
 			code: ({ json }) => {
-				return ``;
+				return '';
 			}
 		}
 	}
