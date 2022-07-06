@@ -7,7 +7,6 @@ import {
 import { AComponent, ComponentInfo } from './a-component';
 import { css } from 'emotion';
 import {
-	nameStringToVariableString,
 	angularClassNamesFromComponentObj,
 	reactClassNamesFromComponentObj
 } from '../utils/fragment-tools';
@@ -85,7 +84,7 @@ function getChildrenExportReact(step: any, child = false) {
 						${step.items.map((innerStep: any) => getChildrenExportReact(innerStep, true)).join('\n')}
 					</OrderedList>`
 				: '' }
-		</ListItem>`
+		</ListItem>`;
 }
 
 function getChildrenExportAngular(step: any) {

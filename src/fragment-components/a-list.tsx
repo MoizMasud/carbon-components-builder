@@ -19,7 +19,6 @@ import {
 } from '../components';
 import image from './../assets/component-icons/radio.svg';
 import {
-	nameStringToVariableString,
 	angularClassNamesFromComponentObj,
 	reactClassNamesFromComponentObj
 } from '../utils/fragment-tools';
@@ -255,16 +254,17 @@ export const componentInfo: ComponentInfo = {
 			outputs: (_) => '',
 			imports: ['ListModule'],
 			code: ({ json, fragments, jsonToTemplate }) => {
-				return `<ol ibmList>
+				return `<ol ibmList
+					${angularClassNamesFromComponentObj(json)}>>
 					${json.items.map((element: any) => jsonToTemplate(element, fragments)).join('\n')}
 				</ol>`;
 			}
 		},
-		react: { // ask z how to export a class>?
+		react: {
 			imports: ['OrderedList'],
-			code: ({  json, fragments, jsonToTemplate }) => {
+			code: ({ json, fragments, jsonToTemplate }) => {
 				return `<OrderedList
-				${reactClassNamesFromComponentObj(json)}>
+					${reactClassNamesFromComponentObj(json)}>
 					${json.items.map((element: any) => jsonToTemplate(element, fragments)).join('\n')}
 				</OrderedList>`;
 			}
