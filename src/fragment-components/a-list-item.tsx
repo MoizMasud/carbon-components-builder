@@ -75,6 +75,31 @@ export const AListItem = ({
 	);
 };
 
+function getChildrenExportReact(step: any, child = false) {
+	if (!step.items) {
+		return;
+	}
+	return `<ListItem>
+				${step.value}
+				${step.items.length > 0 ? `<OrderedList nested={${child}}>
+						${step.items.map((innerStep: any) => getChildrenExportReact(innerStep, true)).join('\n')}
+					</OrderedList>`
+				: '' }
+		</ListItem>`
+}
+
+function getChildrenExportAngular(step: any) {
+	if (!step.items) {
+		return;
+	}
+	return `<li ibmListItem>
+				${step.value}
+				${step.items.length > 0 ? `<ol ibmList>
+					${step.items.map((innerStep: any) => getChildrenExportAngular(innerStep)).join('\n')}
+				</ol>` : ''}
+			</li>`;
+}
+
 export const componentInfo: ComponentInfo = {
 	component: AListItem,
 	settingsUI: AListItemSettingsUI,
@@ -96,17 +121,29 @@ export const componentInfo: ComponentInfo = {
 	hideFromElementsPane: true,
 	codeExport: {
 		angular: {
-			inputs: ({ json }) => '',
-			outputs: ({ json }) => '',
-			imports: [],
+			inputs: (_) => '',
+			outputs: (_) => '',
+			imports: ['ListModule'],
 			code: ({ json }) => {
-				return '';
+				return `<li ibmListItem>
+					${json.value}
+					${angularClassNamesFromComponentObj(json)}
+					${json.items.length > 0 ? `<ol ibmList>
+						${json.items.map((step: any) => getChildrenExportAngular(step)).join('\n')}
+					</ol>` : '' }
+				</li>`;
 			}
 		},
 		react: {
-			imports: [''],
+			imports: ['ListItem'],
 			code: ({ json }) => {
-				return '';
+				return `<ListItem>
+					${json.value}
+					${reactClassNamesFromComponentObj(json)}
+					${json.items.length > 0 ? `<OrderedList nested={true}>
+						${json.items.map((step: any) => getChildrenExportReact(step, true)).join('\n')}
+					</OrderedList>` : '' }
+				</ListItem>`;
 			}
 		}
 	}

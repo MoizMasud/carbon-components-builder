@@ -30,6 +30,10 @@ const LayoutStyle = css`
 		display: none;
 	}
 `;
+const OrderedListStyle = css`
+	margin-left: 20px;
+	list-style: auto;
+`;
 
 const getComponentObjById = (id: string, componentObj: any) => {
 	if (componentObj.id === id) {
@@ -213,7 +217,7 @@ export const AList = ({
 				<legend className={cx(css`margin-left: 3px;`, 'bx--label')}>
 					{componentObj.legendName}
 				</legend>
-				<OrderedList className={css`margin-left: 20px; list-style: auto;`}>
+				<OrderedList className={OrderedListStyle}>
 					{children}
 				</OrderedList>
 			</AComponent>
@@ -247,17 +251,22 @@ export const componentInfo: ComponentInfo = {
 	hideFromElementsPane: false,
 	codeExport: {
 		angular: {
-			inputs: ({ json }) => '',
-			outputs: ({ json }) => '',
-			imports: [],
-			code: ({ json }) => {
-				return '';
+			inputs: (_) => '',
+			outputs: (_) => '',
+			imports: ['ListModule'],
+			code: ({ json, fragments, jsonToTemplate }) => {
+				return `<ol ibmList>
+					${json.items.map((element: any) => jsonToTemplate(element, fragments)).join('\n')}
+				</ol>`;
 			}
 		},
-		react: {
-			imports: [''],
-			code: ({ json }) => {
-				return '';
+		react: { // ask z how to export a class>?
+			imports: ['OrderedList'],
+			code: ({  json, fragments, jsonToTemplate }) => {
+				return `<OrderedList
+				${reactClassNamesFromComponentObj(json)}>
+					${json.items.map((element: any) => jsonToTemplate(element, fragments)).join('\n')}
+				</OrderedList>`;
 			}
 		}
 	}
