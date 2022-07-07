@@ -255,7 +255,7 @@ export const componentInfo: ComponentInfo = {
 			imports: ['ListModule'],
 			code: ({ json, fragments, jsonToTemplate }) => {
 				return `<ol ibmList
-					${angularClassNamesFromComponentObj(json)}>>
+					${angularClassNamesFromComponentObj(json)}>
 					${json.items.map((element: any) => jsonToTemplate(element, fragments)).join('\n')}
 				</ol>`;
 			}
