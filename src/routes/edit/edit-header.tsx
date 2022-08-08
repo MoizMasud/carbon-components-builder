@@ -1,17 +1,23 @@
-import React, { useContext } from 'react';
-import { css } from 'emotion';
-import { Button } from 'carbon-components-react';
+import React, { useContext, useRef, useState } from 'react';
+import { css, cx } from 'emotion';
+import { Button, TextInput } from 'carbon-components-react';
 import {
+	Checkmark16,
+	ChevronLeft24,
 	Copy16,
-	Delete16,
-	Export16,
+	DocumentExport16,
+	Edit16,
+	CircleDash20,
+	Redo16,
+	TrashCan16,
 	Undo16,
-	Redo16
+	View16
 } from '@carbon/icons-react';
 import { ModalContext, ModalActionType } from '../../context/modal-context';
 import { FragmentModal } from './fragment-modal';
 import { GlobalStateContext } from '../../context';
 import { actionIconStyle } from '.';
+import { NavigateFunction, useNavigate, useParams } from 'react-router-dom';
 
 const editHeader = css`
 	left: 16rem;
@@ -24,7 +30,7 @@ const editHeader = css`
 		justify-content: space-between;
 		.title-wrap {
 			height: 3rem;
-			margin-left: 3rem;
+			margin-left: 0;
 			display: flex;
 			align-self: center;
 			flex-flow: column;
@@ -49,6 +55,8 @@ const editHeader = css`
 			font-weight: bold;
 			padding-left: 12px;
 			padding-right: 16px;
+			line-height: 2rem;
+
 			float: left;
 		}
 		.fragment-edit {
@@ -138,14 +146,41 @@ const fragmentEditToolBar = css`
 	}
 `;
 
-export const EditHeader = ({ fragment }: any) => {
+const actionIconSelectedStyle = css`
+	color: #0f62fe;
+`;
+
+const actionIconInheritedStyle = css`
+background: linear-gradient(to top right,
+	rgba(0,0,0,0) 0%,
+	rgba(0,0,0,0) calc(50% - 1.2px),
+	rgba(0,0,0,1) 50%,
+	rgba(0,0,0,0) calc(50% + 1.2px),
+	rgba(0,0,0,0) 100%)
+`;
+
+export const EditHeader = ({ fragment, setFragment }: any) => {
+	const navigate: NavigateFunction = useNavigate();
 	const [, dispatchModal] = useContext(ModalContext);
+	const params = useParams();
+	const [isEditingTitle, setIsEditingTitle] = useState(false);
+	const titleTextInputRef = useRef(null as any);
 	const {
 		canUndo,
 		undoAction,
 		canRedo,
 		redoAction
 	} = useContext(GlobalStateContext);
+
+	const getOutlineHelperText = (outline: boolean | null) => {
+		if (outline === true) {
+			return 'Forcing outline - click to change';
+		}
+		if (outline === false) {
+			return 'Hiding outline - click to change';
+		}
+		return 'Inheriting outline visibility - click to change';
+	};
 
 	return (
 		<header
@@ -154,15 +189,80 @@ export const EditHeader = ({ fragment }: any) => {
 			role='banner'
 			tabIndex={0}>
 			<div className='edit-wrapper'>
-				<div className='title-wrap'>
-					<p className='fragment-title'>{fragment.title}</p>
+				<div className={css`display: flex;`}>
+					<Button
+						kind='ghost'
+						aria-label='Back to dashboard'
+						title='Back to dashboard'
+						onClick={() => navigate('/')}>
+						<ChevronLeft24 className={actionIconStyle} />
+					</Button>
+					<div className='title-wrap'>
+						<p className='fragment-title'>
+							{
+								<div className={isEditingTitle ? css`display: inline-block` : css`display: none`}>
+									<TextInput
+										ref={titleTextInputRef}
+										value={fragment.title}
+										onChange={(event: any) => setFragment({ ...fragment, title: event.target.value })}
+										onKeyDown={(event: any) => {
+											if (event.key === 'Enter') {
+												setIsEditingTitle(false);
+											}
+										}}
+										onBlur={() => setIsEditingTitle(false)}
+										size='sm'
+										light={true} />
+								</div>
+							}
+							{ !isEditingTitle && fragment.title }
+							<Button
+								kind='ghost'
+								size='sm'
+								hasIconOnly
+								renderIcon={isEditingTitle ? Checkmark16 : Edit16}
+								onClick={() => {
+									setIsEditingTitle(!isEditingTitle);
+									// isEditingTitle won't be changed until next render so checking for opposite
+									if (!isEditingTitle) {
+										setTimeout(() => {
+											titleTextInputRef.current?.focus();
+										});
+									}
+								}} />
+						</p>
 
-					<div className='title-subheading'>
-						<div className='date-wrap'>{`Last modified ${ fragment.lastModified}`}</div>
+						<div className='title-subheading'>
+							<div className='date-wrap'>{`Last modified ${fragment.lastModified}`}</div>
+						</div>
 					</div>
 				</div>
 				<div className={fragmentEditToolBar}>
 					<div className='toolBarButtons'>
+						<Button
+							kind='ghost'
+							aria-label={getOutlineHelperText(fragment.outline)}
+							title={getOutlineHelperText(fragment.outline)}
+							onClick={() => setFragment({ ...fragment, outline: fragment.outline === false ? null : !fragment.outline })}>
+							<CircleDash20 className={cx(
+								actionIconStyle,
+								fragment.outline === true ? actionIconSelectedStyle : '',
+								fragment.outline === false ? actionIconInheritedStyle : ''
+							)} />
+						</Button>
+						{
+							process.env.NODE_ENV === 'development' &&
+							<Button
+								kind='ghost'
+								aria-label={'Preview fragment'}
+								title={'Preview fragment'}
+								onClick={() => {
+									window.open(`/view/${params.id}`, '', 'popup');
+								}}>
+								<View16 className={actionIconStyle} />
+							</Button>
+						}
+						<div className={toolBarSeparator} />
 						<Button
 							kind='ghost'
 							aria-label='Undo'
@@ -198,13 +298,13 @@ export const EditHeader = ({ fragment }: any) => {
 								type: ModalActionType.setDeletionModal,
 								id: fragment.id
 							})}>
-							<Delete16 className={actionIconStyle} />
+							<TrashCan16 className={actionIconStyle} />
 						</Button>
 						<Button
 							kind='primary'
 							aria-label='Export fragment'
 							title='Export fragment'
-							renderIcon={Export16}
+							renderIcon={DocumentExport16}
 							onClick={() => dispatchModal({
 								type: ModalActionType.setExportModal,
 								id: fragment.id

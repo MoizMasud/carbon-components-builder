@@ -118,8 +118,7 @@ export const AToggle = ({
 				labelA={componentObj.offText}
 				labelB={componentObj.onText}
 				labelText={componentObj.header}
-				className={` ${preventCheckEvent} ${componentObj.cssClasses?.map((cc: any) => cc.id).join(' ')} `}
-				/>
+				className={` ${preventCheckEvent} ${componentObj.cssClasses?.map((cc: any) => cc.id).join(' ')} `} />
 		</AComponent>
 	);
 };
@@ -133,7 +132,7 @@ export const componentInfo: ComponentInfo = {
 	type: 'toggle',
 	defaultComponentObj: {
 		type: 'toggle',
-		header: 'Toggle header label',
+		header: 'Toggle',
 		offText: 'Off',
 		onText: 'On',
 		disabled: false,
@@ -169,14 +168,13 @@ export const componentInfo: ComponentInfo = {
 			code: ({ json }) => {
 				return `<Toggle
 					labelText="${json.header}"
-					labelA="${json.onText}"
-					labelB="${json.offText}"
+					labelA="${json.offText}"
+					labelB="${json.onText}"
 					${json.disabled ? `disabled="${json.disabled}"` : ''}
 					${json.checked ? `toggled="${json.checked}"` : ''}
 					size="${json.size}"
-					id="${json.id}"
-					${reactClassNamesFromComponentObj(json)}
-					/>`;
+					id="${json.codeContext?.name}"
+					${reactClassNamesFromComponentObj(json)} />`;
 			}
 		}
 	}

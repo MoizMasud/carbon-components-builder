@@ -18,6 +18,7 @@ import {
 	nameStringToVariableString,
 	reactClassNamesFromComponentObj
 } from '../../utils/fragment-tools';
+import { APlaceholder } from '../a-placeholder';
 
 export const ARadioTileSettingsUI = ({ selectedComponent, setComponent }: any) => {
 	const [fragment] = useFragment();
@@ -128,7 +129,7 @@ export const ARadioTile = ({
 							formItemName: componentObj.codeContext?.formItemName
 						},
 						...(componentObj.light !== undefined ? { light: componentObj.light } : ''),
-						items: [{ type: 'text', text: 'New radio tile' }]
+						items: []
 					}
 				},
 				parentComponent.id,
@@ -157,7 +158,9 @@ export const ARadioTile = ({
 				value={componentObj.codeContext?.value}
 				className={componentObj.cssClasses?.map((cc: any) => cc.id).join(' ')}
 				onDrop={onDrop}>
-					{children}
+					{
+						children && children.length > 0 ? children : <APlaceholder componentObj={componentObj} select={rest.select} />
+					}
 				</RadioTile>
 			</AComponent>
 		</Adder>
@@ -177,14 +180,14 @@ export const componentInfo: ComponentInfo = {
 		defaultChecked: false,
 		items: []
 	},
-	render: ({ componentObj, select, remove, selected, onDragOver, onDrop, renderComponents }) => <ARadioTile
+	render: ({ componentObj, select, remove, selected, onDragOver, onDrop, renderComponents, outline }) => <ARadioTile
 		componentObj={componentObj}
 		select={select}
 		remove={remove}
 		selected={selected}
 		onDragOver={onDragOver}
 		onDrop={onDrop}>
-			{componentObj.items.map((item: any) => renderComponents(item))}
+			{componentObj.items.map((item: any) => renderComponents(item, outline))}
 	</ARadioTile>,
 	/**
 	 * Can only be added by adding tile-group or by clicking `plus` icon on top or bottom

@@ -11,6 +11,7 @@ import { AComponent } from './a-component';
 import { useFragment } from '../context';
 import { getParentComponent, updatedState } from '../components';
 import { ComponentInfo } from '.';
+import { APlaceholder } from './a-placeholder';
 
 const helpIconStyle = css`
 	color: #525252;
@@ -142,21 +143,38 @@ export const AColumnSettingsUI = ({ selectedComponent, setComponent }: any) => {
 	</>;
 };
 
-const addStyle = css`
+const addStyleLeftRight = css`
 	position: absolute;
-	margin-top: -2px;
+	margin-top: 14px;
 	background: white;
 	border: 2px solid #d8d8d8;
 	line-height: 21px;
 	z-index: 1;
 `;
 
-const addStyleLeft = cx(addStyle, css`
+const addStyleLeft = cx(addStyleLeftRight, css`
 	margin-left: -30px;
 `);
 
-const addStyleRight = cx(addStyle, css`
+const addStyleRight = cx(addStyleLeftRight, css`
 	margin-left: calc(100% - 30px);
+`);
+
+const addStyleTopBottom = css`
+	position: absolute;
+	margin-left: calc(50% - 10px);
+	background: white;
+	border: 2px solid #d8d8d8;
+	line-height: 21px;
+`;
+
+const addStyleTop = cx(addStyleTopBottom, css`
+	top: -20px;
+`);
+
+const addStyleBottom = cx(addStyleTopBottom, css`
+	bottom: -20px;
+	z-index: 1;
 `);
 
 const iconStyle = css`
@@ -176,6 +194,29 @@ export const AColumn = ({
 
 	const parentComponent = getParentComponent(fragment.data, componentObj);
 
+	const grandParentComponent = getParentComponent(fragment.data, parentComponent);
+
+	/**
+	 * @param offset 0 - add left, 1 - add right
+	 */
+	const addRow = (offset = 0) => setFragment({
+		...fragment,
+		data: updatedState(
+			fragment.data,
+			{
+				type: 'insert',
+				component: {
+					type: 'row', items: [
+						{ type: 'column', items: [] },
+						{ type: 'column', items: [] }
+					]
+				}
+			},
+			grandParentComponent.id,
+			grandParentComponent.items.indexOf(parentComponent) + offset
+		)
+	});
+
 	/**
 	 * @param offset 0 - add left, 1 - add right
 	 */
@@ -187,7 +228,7 @@ export const AColumn = ({
 				type: 'insert',
 				component: {
 					type: 'column',
-					items: [{ type: 'text', text: 'New cell' }]
+					items: []
 				}
 			},
 			parentComponent.id,
@@ -221,6 +262,12 @@ export const AColumn = ({
 			span: componentObj.maxSpan || undefined,
 			offset: componentObj.maxOffset || undefined
 		}}>
+			<span className={cx(addStyleTop, selected ? css`` : css`display: none`)}>
+				<Add32 onClick={(event: any) => {
+					event.stopPropagation();
+					addRow();
+				}} className={iconStyle}/>
+			</span>
 			<span className={cx(addStyleLeft, selected ? css`` : css`display: none`)}>
 				<Add32 onClick={(event: any) => {
 					event.stopPropagation();
@@ -233,12 +280,29 @@ export const AColumn = ({
 					addCell(1);
 				}} className={iconStyle}/>
 			</span>
+			<span className={cx(addStyleBottom, selected ? css`` : css`display: none`)}>
+				<Add32 onClick={(event: any) => {
+					event.stopPropagation();
+					addRow(1);
+				}} className={iconStyle}/>
+			</span>
 			<AComponent
 			componentObj={componentObj}
-			className={css`display: block;`}
+			className={css`display: block; height: 100%;`}
 			selected={selected}
+			rejectDrop={(dragObj: any) => {
+				// don't allow dropping columns directly into other columns
+				// row drop handler will take over
+				if (dragObj.component.type === 'column') {
+					return true;
+				}
+
+				return false;
+			}}
 			{...rest}>
-				{children}
+				{
+					children && children.length > 0 ? children : <APlaceholder componentObj={componentObj} select={rest.select} />
+				}
 			</AComponent>
 		</Column>
 	);
@@ -247,7 +311,7 @@ export const AColumn = ({
 export const componentInfo: ComponentInfo = {
 	component: AColumn,
 	settingsUI: AColumnSettingsUI,
-	render: ({ componentObj, select, remove, selected, onDragOver, onDrop, renderComponents }) => <AColumn
+	render: ({ componentObj, select, remove, selected, onDragOver, onDrop, renderComponents, outline }) => <AColumn
 		componentObj={componentObj}
 		select={select}
 		remove={remove}
@@ -255,7 +319,7 @@ export const componentInfo: ComponentInfo = {
 		onDragOver={onDragOver}
 		onDrop={onDrop}>
 			{componentObj.items.map((column: any) => (
-				renderComponents(column)
+				renderComponents(column, outline)
 			))}
 	</AColumn>,
 	keywords: ['column', 'grid'],
