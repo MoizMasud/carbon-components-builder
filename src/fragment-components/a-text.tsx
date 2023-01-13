@@ -1,22 +1,25 @@
 import React from 'react';
-import { TextInput } from 'carbon-components-react';
 import { AComponent } from './a-component';
 import { ComponentInfo } from '.';
-
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import dompurify from 'dompurify';
 import image from './../assets/component-icons/text.svg';
 import { angularClassNamesFromComponentObj, reactClassNamesFromComponentObj } from '../utils/fragment-tools';
 
 export const ATextSettingsUI = ({ selectedComponent, setComponent }: any) => {
-	return <TextInput
+	return (
+		<ReactQuill
+			key={selectedComponent.id}
+			theme="snow"
 			value={selectedComponent.text}
-			labelText='Text'
-			onChange={(event: any) => {
+			onChange={(event) => {
 				setComponent({
 					...selectedComponent,
-					text: event.currentTarget.value
-				});
-			}}
-		/>;
+					text: event
+			});
+		}} />
+	);
 };
 
 export const AText = ({
@@ -43,7 +46,7 @@ export const componentInfo: ComponentInfo = {
 		select={select}
 		remove={remove}
 		selected={selected}>
-			{componentObj.text}
+			<div dangerouslySetInnerHTML={{ __html: dompurify.sanitize(componentObj.text) }} />
 	</AText>,
 	keywords: ['text'],
 	name: 'Text',
