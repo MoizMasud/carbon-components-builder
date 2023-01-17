@@ -13,7 +13,7 @@ export const ATextSettingsUI = ({ selectedComponent, setComponent }: any) => {
 			key={selectedComponent.id}
 			theme="snow"
 			value={selectedComponent.text}
-			onChange={(event) => {
+			onChange={(event: any) => {
 				setComponent({
 					...selectedComponent,
 					text: event
