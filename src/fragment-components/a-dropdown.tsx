@@ -59,6 +59,11 @@ export const ADropdownSettingsUI = ({ selectedComponent, setComponent }: any) =>
 				value={item.text}
 				labelText='Display text'
 				onChange={(event: any) => handleItemUpdate('text', event.currentTarget.value, index)} />
+			<Checkbox
+				labelText='Selected'
+				id={`selected-${index}`}
+				checked={item.selected}
+				onChange={(checked: boolean) => handleItemUpdate('selected', checked, index)} />
 			{
 				selectedComponent.isMulti &&
 				<div style={{ display: 'flex' }}>
@@ -193,7 +198,8 @@ export const ADropdownSettingsUI = ({ selectedComponent, setComponent }: any) =>
 			setDataList={updateStepList}
 			updateItem={handleItemUpdate}
 			defaultObject={{
-				text: 'Text'
+				text: 'Text',
+				selected: false
 			}}
 			template={template} />
 		<hr />
@@ -276,7 +282,8 @@ export const componentInfo: ComponentInfo = {
 		helperText: 'Optional helper text',
 		listItems: [
 			{
-				text: 'Text'
+				text: 'Text',
+				selected: false
 			}
 		]
 	},
@@ -287,9 +294,10 @@ export const componentInfo: ComponentInfo = {
 				const name = nameStringToVariableString(json.codeContext?.name);
 				const items = json.listItems.map((item: any) => ({
 					content: item.text,
+					selected: item.selected,
 					...(json.isMulti && item.selected) && { selected: item.selected }
 				}));
-
+				const selectedItem = items.find((item: any) => item.selected) ?? null;
 				return `@Input() ${name}Label = "${json.label}";
 				@Input() ${name}HelperText = "${json.helperText}";
 				@Input() ${name}Placeholder = "${json.placeholder}";
@@ -301,6 +309,7 @@ export const componentInfo: ComponentInfo = {
 				@Input() ${name}WarnText = "${json.warnText ? json.warnText : ''}";
 				@Input() ${name}Disabled = ${!!json.disabled};
 				@Input() ${name}DropUp = ${json.direction !== 'bottom'};
+				@Input() ${name}SelectedItem = ${selectedItem};
 				@Input() ${name}SelectionFeedback = "${json.selectionFeedback}";
 				@Input() ${name}Type: "single" | "multi" = "${json.isMulti ? 'multi' : 'single'}";
 				@Input() ${name}Items = ${JSON.stringify(items)};`;
@@ -322,6 +331,7 @@ export const componentInfo: ComponentInfo = {
 					[invalidText]="${name}InvalidText"
 					[size]="${name}Size"
 					[warn]="${name}Warn"
+					[selectedItem]="${name}SelectedItem"
 					[warnText]="${name}WarnText"
 					[disabled]="${name}Disabled"
 					[dropUp]="${name}DropUp"
