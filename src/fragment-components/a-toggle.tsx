@@ -170,8 +170,8 @@ export const componentInfo: ComponentInfo = {
 					labelText="${json.header}"
 					labelA="${json.offText}"
 					labelB="${json.onText}"
-					${json.disabled ? `disabled="${json.disabled}"` : ''}
-					${json.checked ? `toggled="${json.checked}"` : ''}
+					${json.disabled ? `disabled={${json.disabled}}` : ''}
+					${json.checked ? `toggled={${json.checked}}` : ''}
 					size="${json.size}"
 					id="${json.codeContext?.name}"
 					checked={state["${json.codeContext?.name}"]?.checked}
@@ -180,7 +180,7 @@ export const componentInfo: ComponentInfo = {
 							name: "${json.codeContext?.name}",
 							value: checked
 						}
-					})} 
+					})}
 					${reactClassNamesFromComponentObj(json)} />`;
 			}
 		}
